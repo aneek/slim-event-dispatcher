@@ -23,11 +23,7 @@
   "autoload": {
     "psr-4": {
         "Slim\\Event\\": "./src/Event"
-      },
-      "files": [
-        "./DomainListener.php",
-        "./DomainEvent.php"
-      ]
+      }
     },
     "autoload-dev": {
       "psr-4": {
