@@ -1,0 +1,12 @@
+# Restrict PHPStorm & Eclipse directory.
+.idea
+.settings
+.project
+.buildpath
+
+# Exclude Composer vendor and lock.
+vendor
+composer.lock
+
+# Exclude index file.
+index.php
