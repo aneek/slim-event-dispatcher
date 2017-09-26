@@ -1,8 +1,7 @@
 {
   "name": "aneek/slim-event-dispatcher",
   "type": "library",
-  "version": "1.x-dev",
-  "description": "An event dispatcher bridge with League Event",
+  "description": "An event dispatcher bridge between League Event and Slim Framework.",
   "license" : "MIT",
   "keywords": ["slim framework", "event", "event-dispatcher", "emitter", "listener"],
   "authors": [
