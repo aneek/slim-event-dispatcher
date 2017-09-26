@@ -27,7 +27,7 @@
     },
     "autoload-dev": {
       "psr-4": {
-        "Event\\Tests\\": "./tests"
+        "Slim\\Event\\Tests\\": "./tests"
       }
     },
     "config": {

@@ -33,11 +33,23 @@ class SlimEventManager
         if (!empty($subscribers)) {
             // Register given subscriber's.
             $this->subscribers = $subscribers;
-            $this->add($this->subscribers);
+            $this->addListeners($this->subscribers);
         }
     }
-
-    public function subscribe($event, $listener, $priority = ListenerAcceptorInterface::P_NORMAL)
+    
+    /**
+     * Add a listner.
+     *
+     * @param string $event
+     *   The event name.
+     * @param mixed $listener
+     *   Either \League\Event\ListenerInterface or Callable listner.
+     * @param int $priority
+     *   Listner priority.
+     *   
+     * @return void
+     */
+    public function add($event, $listener, $priority = ListenerAcceptorInterface::P_NORMAL)
     {
         $subscriber = [
             $event => [
@@ -45,16 +57,31 @@ class SlimEventManager
                 'priority' => $priority,
             ],
         ];
-        $this->add($subscriber);
+        $this->addListeners($subscriber);
     }
 
     /**
-     * Add listners.
+     * Magic method to call each public method from available emitter.
+     *
+     * @param string $method
+     *   The name of the public method from Emitter class.
+     * @param mixed $parameters
+     *   The arguments passed to the method.
+     *
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->getEmitter()->$method(...$parameters);
+    }
+    
+    /**
+     * Internal method to add multiple listners.
      *
      * @param array $subscribers
      *   An array containing event subscribers.
      */
-    protected function add(array $subscribers = [])
+    protected function addListeners(array $subscribers = [])
     {
         if (!empty($subscribers)) {
             foreach ($subscribers as $event => $subscriber) {
