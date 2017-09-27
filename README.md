@@ -111,3 +111,12 @@ $app->get('/hello/{name}', function (Request $request, Response $response, $args
 
 $app->run();
 ```
+
+## Creating Events or Listeners
+``Events`` or ``Listeners`` can be created by following the below guides from ``League\Event``.
+
+- Event creation [guide](http://event.thephpleague.com/2.0/events/named/).
+- Listener creation [guide](http://event.thephpleague.com/2.0/listeners/callables/).
+
+## Issues
+Please open a new issue and I will be happy to look into it.
