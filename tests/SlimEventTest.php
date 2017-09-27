@@ -22,7 +22,7 @@ class SlimEventTest extends PHPUnit_Framework_TestCase
 {
 
     /**
-     * An array of event listners.
+     * An array of event Listeners.
      *
      * @var array
      */
@@ -42,8 +42,8 @@ class SlimEventTest extends PHPUnit_Framework_TestCase
     {
         $this->events = [
             'event.one' => [
-                'listener' => \Slim\Event\Tests\TestListner::class,
-            ],
+                [\Slim\Event\Tests\SlimEventTestListener::class, 100]
+            ]
         ];
 
         $this->eventManager = new SlimEventManager($this->events);
@@ -58,9 +58,9 @@ class SlimEventTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers SlimEventManager::addListners()
+     * @covers SlimEventManager::addListeners()
      */
-    public function testAddListners()
+    public function testAddListeners()
     {
         $this->assertTrue($this->eventManager->hasListeners('event.one'));
     }
@@ -74,8 +74,50 @@ class SlimEventTest extends PHPUnit_Framework_TestCase
             return $event;
         });
 
-        // Check if this listner is set or not.
+        // Check if this listener is set or not.
         $this->assertTrue($this->eventManager->hasListeners('event.two'));
+    }
+
+    /**
+     * @covers SlimEventManager::addListeners()
+     *
+     * Checks the exception if no Listener(s) given.
+     */
+    public function testAddExceptionWithBlankListener()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $event = [
+            'event.error' => []
+        ];
+        new SlimEventManager($event);
+    }
+
+    /**
+     * @covers SlimEventManager::addListeners()
+     *
+     * Checks the exception if listener array is empty.
+     */
+    public function testAddExceptionWithBlankListenerArray()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $event = [
+            'event.error' => [
+                []
+            ]
+        ];
+        new SlimEventManager($event);
+    }
+
+    /**
+     * @covers SlimEventManager::addListeners()
+     *
+     * Checks for the \InvalidArgumentException thrown when the given listener is not
+     * a FQCN or a Callable.
+     */
+    public function testAddExceptionWithListenerType()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->eventManager->add('event.three', 'THROW INVALID ARGUMENT');
     }
 
     /**

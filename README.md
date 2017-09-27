@@ -41,16 +41,13 @@ $settings = [
 // Array of event Listeners
 $events = [
     'event.one' => [
-        // Mandatory key
-        'listener' => \FooListener::class,
-        // Optional
-        'priority' => 100,
-    ],
-    'event.one' => [
-        'listener' => \BarListener::class
+        // First element is the FQCN class. This element is mandatory.
+        // Second element is the listener priority but this is not mandatory.
+        [\FooListener::class, 100],
+        [\BarListener::class]    
     ],
     'event.two' => [
-        'listener' => \BazListener::class
+        [\BazListener::class]
     ]
 ];
 

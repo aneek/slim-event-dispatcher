@@ -25,7 +25,7 @@ class SlimEventManager
     /**
      * Class Constructor.
      *
-     * @param array $events
+     * @param array $subscribers
      *   An array containing the application's event(s).
      */
     public function __construct(array $subscribers = [])
@@ -38,24 +38,24 @@ class SlimEventManager
     }
     
     /**
-     * Add a listner.
+     * Add a listener.
      *
      * @param string $event
      *   The event name.
      * @param mixed $listener
-     *   Either \League\Event\ListenerInterface or Callable listner.
+     *   Either \League\Event\ListenerInterface or Callable listener.
      * @param int $priority
-     *   Listner priority.
+     *   Listener priority.
      *   
      * @return void
      */
     public function add($event, $listener, $priority = ListenerAcceptorInterface::P_NORMAL)
     {
+        // Create an array of event subscribers to pass to the main addition method.
         $subscriber = [
             $event => [
-                'listener' => $listener,
-                'priority' => $priority,
-            ],
+                [$listener, $priority]
+            ]
         ];
         $this->addListeners($subscriber);
     }
@@ -76,7 +76,7 @@ class SlimEventManager
     }
     
     /**
-     * Internal method to add multiple listners.
+     * Internal method to add multiple listeners.
      *
      * @param array $subscribers
      *   An array containing event subscribers.
@@ -84,18 +84,29 @@ class SlimEventManager
     protected function addListeners(array $subscribers = [])
     {
         if (!empty($subscribers)) {
-            foreach ($subscribers as $event => $subscriber) {
-                if (in_array('League\Event\ListenerInterface', class_implements($subscriber['listener']))) {
-                    // If this is a class then it should implement ListenerInterface.
-                    $listener = new $subscriber['listener']();
-                } elseif (is_callable($subscriber['listener'])) {
-                    // If this is a callable then check.
-                    $listener = CallbackListener::fromCallable($subscriber['listener']);
+            foreach ($subscribers as $event => $listeners) {
+                if (!empty($listeners)) {
+                    foreach ($listeners as $listener) {
+                        // First array key is the listener and the second is the priority.
+                        if (!array_key_exists(0, $listener)) {
+                            throw new \InvalidArgumentException('Listeners should be provided as the first element of the array.');
+                        }
+                        // If the class name is given then that should be string and should exist.
+                        if (is_string($listener[0]) && class_exists($listener[0]) &&
+                            in_array('League\Event\ListenerInterface', class_implements($listener[0]))) {
+                            $eventListener = new $listener[0]();
+                        } elseif (is_callable($listener[0])) {
+                            $eventListener = CallbackListener::fromCallable($listener[0]);
+                        } else {
+                            throw new \InvalidArgumentException(sprintf("Subscriber for event '%s' is not properly defined.", $event));
+                        }
+                        $priority = (array_key_exists(1, $listener) ? $listener[1] : ListenerAcceptorInterface::P_NORMAL);
+                        $this->addListener($event, $eventListener, $priority);
+                    }
                 } else {
-                    throw new \InvalidArgumentException(sprintf("Subscriber '%s' is not properly defined.", $event));
+                    // If there is an array of listeners then it can't be empty.
+                    throw new \InvalidArgumentException('At least one listener has to be provided.');
                 }
-                $priority = (array_key_exists('priority', $subscriber) ? $subscriber['priority'] : ListenerAcceptorInterface::P_NORMAL);
-                $this->addListener($event, $listener, $priority);
             }
         }
     }

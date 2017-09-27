@@ -5,7 +5,7 @@ namespace Slim\Event\Tests;
 use League\Event\AbstractListener;
 use League\Event\EventInterface;
 
-class TestListner extends AbstractListener
+class SlimEventTestListener extends AbstractListener
 {
 
     /**
